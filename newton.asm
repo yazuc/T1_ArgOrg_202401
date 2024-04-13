@@ -2,60 +2,76 @@
     prompt1: .asciiz "Programa de Raiz Quadrada  Newton-Raphson\n"
     prompt2: .asciiz "Desenvolvedores: Leonardo T. Rubert\n"
     prompt3: .asciiz "Terminou de rodar a recursao\n"
-    prompt4: .asciiz "Insira um valor para x:"
-    prompt5: .asciiz "Insira um valor para i:"
+    prompt4: .asciiz "Insira um valor para x: "
+    prompt5: .asciiz "Insira um valor para i: "
+    prompt6: .asciiz "\n"
     result_prompt: .asciiz "%f\n"
+
 .text
 .globl main
+
 main:
     # Print prompts
     li $v0, 4                    
     la $a0, prompt1              
-    syscall			 # printa nome programa
+    syscall                     # Printa o nome do programa
 
     li $v0, 4                    
-    la $a0, prompt2              # printa desenvolvedor
-    syscall
-    
+    la $a0, prompt2              
+    syscall                     # Printa o nome do desenvolvedor
+
+input_loop:
     li $v0, 4                    
-    la $a0, prompt4              # printa prompt para usuário inserir x
+    la $a0, prompt4              # Printa o prompt para inserir o valor de x
     syscall
-    
+
     # Lê o input do usuário para x
-    li $v0, 5                   # faz o setup para ler input
-    syscall                     # lê o input do usuário para x
-    move $t0, $v0               # guarda o input do usuário em t0
+    li $v0, 5                   
+    syscall                      # Lê o input do usuário para x
+    move $t0, $v0                # Salva o valor de x em $t0
+    
+    # Verifica se x é negativo (-1)
+    beq $t0, -1, end_program     # Se x for negativo, termina o programa
     
     li $v0, 4                    
-    la $a0, prompt5              # printa prompt para usuário inserir i
+    la $a0, prompt5              # Printa o prompt para inserir o valor de i
     syscall
-    
+
     # Lê o input do usuário para i
-    li $v0, 5                   # faz o setup para ler input
-    syscall                     # lê o input do usuário para i
-    move $t1, $v0               # Store the input value of i in $t1
+    li $v0, 5                   
+    syscall                      # Lê o input do usuário para i
+    move $t1, $v0                # Salva o valor de i em $t1
     
-    addi $sp, $sp, -12          # aloca espaço no sp para os dois valores e a pilha
+    # Verifica se i é negativo (-1)
+    beq $t1, -1, end_program     # Se i for negativo, termina o programa
     
-    # manda os valores inseridos pelo usuário para a pilha
-    sw $t0, 8($sp)              # aloca o x na pilha
-    sw $t1, 4($sp)              # aloca o i na pilha
+    addi $sp, $sp, -12           # Aloca espaço na pilha para x, i e endereço de retorno
     
-    sw $ra, 0($sp)              # aloca o ra na pilha
+    # Passa os valores de entrada do usuário para a pilha
+    sw $t0, 8($sp)               # Salva x na pilha
+    sw $t1, 4($sp)               # Salva i na pilha
+    sw $ra, 0($sp)               # Salva o endereço de retorno na pilha
     
-    jal sqrt                    # chama a funcao para comecar a recursão
+    jal sqrt                     # Chama a função sqrt para iniciar a recursão
     
-    lw $ra, 0($sp)		 # recupera $ra
-    addi $sp, $sp, 12		 # adiciona os 12 bytes de volta na pilha           
+    lw $ra, 0($sp)               # Restaura o endereço de retorno
+    addi $sp, $sp, 12            # Adiciona os 12 bytes de volta na pilha       
+    
+    # Printa o resultado
+    move $a0, $v0                # Move o resultado para $a0 para imprimir
+    li $v0, 1                    # Serviço de syscall para imprimir um inteiro
+    syscall                      # Imprime o resultado        
+    
+    li $v0, 4                    
+    la $a0, prompt6              # Printa linha em branco
+    syscall                     # Imprime linha em branco
+    
+    j input_loop                 # Volta para o início do loop para continuar solicitando entradas
 
-    # Print resultado
-    move	$a0, $v0	 # move resultado para v0 para imprimir
-    li $v0, 1                    # syscall: print int
-    syscall
-
+end_program:
     # Termina o programa
-    li $v0, 10                   # syscall: exit
-    syscall
+    li $v0, 10                   # Serviço de syscall para terminar o programa
+    syscall                      # Termina o programa
 
 sqrt:
     lw $a0, 8($sp)               # carrega o x da pilha
@@ -81,4 +97,4 @@ sqrt_nr:
     add $a0, $a0, $v0         # adiciona o resultado da chamada recursiva
     srl $a0, $a0, 1           # usa shift right pra divisão por 2
     move $v0, $a0             # move o resultado pra v0
-    jr $ra                    # retorna pra quem fez a chamada
+    jr $ra                    # retorna pra quem fezz a chamada
