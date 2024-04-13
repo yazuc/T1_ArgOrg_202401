@@ -10,13 +10,8 @@ float sqrt_nr(int v, int i){
     if(i > 0){
         float parte1 = sqrt_nr(v, i - 1 );
         float parte2 = v/sqrt_nr(v, i - 1);
-        printf("Valores que estao acontecendo: %d %d \n ", v, i);
         float parte3 = (parte1 + parte2)/2;
-
-        printf("sqrt_nr(v, i - 1): %f \n", parte1);
-        printf("(v/sqrt_nr(v, i - 1)):  %f \n", parte2);
-        printf("(parte1 + parte2)/2  resultado: %f \n", parte3);
-
+        
         return (float) parte3;
     }
 }
